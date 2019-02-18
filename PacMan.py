@@ -106,10 +106,14 @@ def FrameTask():
     #when you need to clear the screen
     ClearScreen() 
     Player.MoveByXY(Player.Xspeed,Player.Yspeed)
-    Enemy_Pink.MoveByXY(Player.Xspeed,Player.Yspeed)
-    Enemy_Blue.MoveByXY(Player.Xspeed,Player.Yspeed)
-    Enemy_Orange.MoveByXY(Player.Xspeed,Player.Yspeed)
-    Enemy_Red.MoveByXY(Player.Xspeed,Player.Yspeed)
+    Enemy_Pink.MoveByXY(Enemy_Pink.Speed,0)
+    Enemy_Blue.MoveByXY(Enemy_Blue.Speed,Enemy_Blue.Speed)
+    Enemy_Orange.MoveByXY(0,Enemy_Orange.Speed)
+    Enemy_Red.MoveByXY(-Enemy_Red.Speed,0)
+    Enemy_Pink.IfOnEdgeBounce()
+    Enemy_Blue.IfOnEdgeBounce()
+    Enemy_Red.IfOnEdgeBounce()
+    Enemy_Orange.IfOnEdgeBounce()
     if Player.rect.left >= 600:
         Player.rect.left = 0
     if Player.rect.left < 0:
@@ -194,11 +198,20 @@ class Actor(pygame.sprite.Sprite):
 class Enemy(Actor):
     def __init__(self,_pos = (0,0)):
         Actor.__init__(self,"Role.png",_pos)
+        self.position = _pos
     def SetImage(self,_index):
         #子类直接修改父类的属性，用self访问
         self.rect = pygame.Rect(50*(_index+1),0,50,50)
         self.image = self.image.subsurface(self.rect)
         self.images[0] = self.image
+        self.SetPosition(self.position[0],self.position[1])
+    #如果撞到屏幕边界，反弹
+    def IfOnEdgeBounce(self):
+        global SCREEN_WIDTH,SCREEN_HEIGHT
+        if(self.rect.left > SCREEN_WIDTH or \
+            self.rect.top < 0 or self.rect.left <0 or \
+                self.rect.top > SCREEN_HEIGHT):
+                self.Speed = -self.Speed
 
 global AllImg #所有的角色的图像都在一副png图片里
 global Player,Enemy_Pink,Enemy_Orange,Enemy_Blue,Enemy_Red
@@ -217,17 +230,14 @@ def main():
 
     AllImg = Actor("Role.png")
     Player = Actor("Role.png")
-    '''
-    修改这里！！！！！！！！！！！！！！！！！！！！！！！！！
-    '''
-    #在SetImage中重新定义了Rect，所以目前来说初始化的_pos没用了，这部分需要修改
+    
     Enemy_Pink = Enemy(_pos = (100,100))
     Enemy_Pink.SetImage(1)
-    Enemy_Blue = Enemy(_pos = (200,100))
+    Enemy_Blue = Enemy(_pos = (100,200))
     Enemy_Blue.SetImage(2)
-    Enemy_Orange = Enemy(_pos = (300,100))
+    Enemy_Orange = Enemy(_pos = (100,300))
     Enemy_Orange.SetImage(3)
-    Enemy_Red = Enemy(_pos = (400,100))
+    Enemy_Red = Enemy(_pos = (100,400))
     Enemy_Red.SetImage(4)
     
     Player.rect = pygame.Rect(0,0,50,50)
