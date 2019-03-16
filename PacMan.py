@@ -98,7 +98,7 @@ def FrameTask():
     #每帧的任务
     global CLOCK,SCREEN
     global Player,Enemy_Orange,Enemy_Blue,Enemy_Red
-    global GroupAll
+    global GroupAll,GroupEnemy
     global IMAGECHANGEFLAG
     #Frame = 40 fps   
     #CLOCK.tick(60) 
@@ -130,6 +130,10 @@ def FrameTask():
         else:
             Player.image = Player.images[0]
             Player.ImgIndex = 0
+    collidesprite = pygame.sprite.spritecollideany(Player,GroupEnemy)
+    if collidesprite != None:
+        GroupAll.remove(collidesprite)
+        GroupEnemy.remove(collidesprite)        
     GroupAll.draw(SCREEN)  
     #end of FrameTask
 
@@ -215,7 +219,7 @@ class Enemy(Actor):
 
 global AllImg #所有的角色的图像都在一副png图片里
 global Player,Enemy_Pink,Enemy_Orange,Enemy_Blue,Enemy_Red
-global GroupAll
+global GroupAll,GroupEnemy
 global MapMatrix
 
 MapMatrix = numpy.zeros((24,24),numpy.int)
@@ -224,7 +228,7 @@ def main():
     global SCREEN
     global Player,Enemy_Pink,Enemy_Orange,Enemy_Blue,Enemy_Red
     global AllImg
-    global GroupAll
+    global GroupAll,GroupEnemy
     global CLOCKTICKFLAG
     initialize() 
 
@@ -246,9 +250,11 @@ def main():
     tmprect = pygame.Rect(50,0,50,50)
     Player.images.append(AllImg.image.subsurface(tmprect))
     
-    GroupAll = pygame.sprite.Group() 
+    GroupAll = pygame.sprite.Group()
+    GroupEnemy = pygame.sprite.Group() 
     GroupAll.add(Player) 
     GroupAll.add(Enemy_Pink,Enemy_Blue,Enemy_Orange,Enemy_Red)
+    GroupEnemy.add(Enemy_Pink,Enemy_Blue,Enemy_Orange,Enemy_Red)
     GroupAll.draw(SCREEN) 
 
     while True:          
